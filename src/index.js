@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
-import { HashRouter, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 
 import indexRoutes from "./routes/index.jsx";
-
+import { StateProvider, useStateValue } from "./state";
 import registerServiceWorker from "./registerServiceWorker";
 
 import "./assets/css/bootstrap.min.css";
@@ -13,37 +13,73 @@ import "./assets/css/pe-icon-7-stroke.css";
 import Axios from "axios";
 import { deepStrictEqual } from "assert";
 
-const App = () => (
-  <HashRouter>
-    <Switch>
-      {indexRoutes.map((prop, key) => {
-        return <Route path={prop.path} component={prop.component} key={key} />;
-      })}
-    </Switch>
-  </HashRouter>
-);
+const App = () => {
+  const initialState = {
+    app: {
+      token: "",
+      isLogin: sessionStorage.getItem("token") ? true : false
+    },
+    profile: {}
+  };
+  const appReducer = (app, action) => {
+    switch (action.type) {
+      case "LOGIN":
+        return {
+          ...app,
+          isLogin: true,
+          token: action.token
+        };
+      case "LOG_OUT":
+        return {
+          ...app,
+          isLogin: false,
+          token: ""
+        };
+    }
+  };
+  const profileReducer = (profile, action) => {
+    switch (action.type) {
+    }
+  };
+  const mainReducer = ({ app, profile }, action) => ({
+    app: appReducer(app, action),
+    profile: profileReducer(profile, action)
+  });
+  return (
+    <StateProvider initialState={initialState} reducer={mainReducer}>
+      <BrowserRouter>
+        <Switch>
+          {indexRoutes.map((prop, key) => {
+            return (
+              <Route path={prop.path} component={prop.component} key={key} />
+            );
+          })}
+        </Switch>
+      </BrowserRouter>
+    </StateProvider>
+  );
+};
+
 const Test = () => {
   const handleChangeImage = e => {
     console.log(e.target.files[0]);
     setFile(e.target.files[0]);
   };
-  const [file,setFile] = useState('');
-  const handleSubmit = async e =>{
+  const [file, setFile] = useState("");
+  const handleSubmit = async e => {
     e.preventDefault();
     let fd = new FormData();
-    fd.append('avatar',file);
+    fd.append("avatar", file);
     let data = {
-      name:'123'
-    }
-    let res = await Axios.post("http://localhost:3000/api/user/uploadAvatar",{fd,data});
+      name: "123"
+    };
+    let res = await Axios.post(
+      "http://localhost:3000/api/user/uploadAvatar",
+      fd
+    );
     console.log(res.data);
-  }
-  return (
-    <form onSubmit={handleSubmit} id="uploadfile">
-      <input type="file" onChange={handleChangeImage} name="avatar" />
-      <input type="submit" value="Upload a file" />
-    </form>
-  );
+  };
+  return <App />;
 };
-ReactDOM.render(<Test />, document.getElementById("root"));
+ReactDOM.render(<App />, document.getElementById("root"));
 registerServiceWorker();

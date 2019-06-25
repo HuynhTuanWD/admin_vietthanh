@@ -1,11 +1,10 @@
+import LoginPage from 'views/Pages/LoginPage.jsx';
 import React, { Component } from "react";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route,Redirect } from "react-router-dom";
 
 import Footer from "components/Footer/Footer.jsx";
 import PagesHeader from "components/Header/PagesHeader.jsx";
-
 // dinamically create pages routes
-import pagesRoutes from "routes/pages.jsx";
 
 import bgImage from "assets/img/full-screen-image-3.jpg";
 
@@ -36,7 +35,7 @@ class Pages extends Component {
   render() {
     return (
       <div>
-        <PagesHeader />
+        {/* <PagesHeader /> */}
         <div className="wrapper wrapper-full-page">
           <div
             className={"full-page" + this.getPageClass()}
@@ -45,18 +44,11 @@ class Pages extends Component {
           >
             <div className="content">
               <Switch>
-                {pagesRoutes.map((prop, key) => {
-                  return (
-                    <Route
-                      path={prop.path}
-                      component={prop.component}
-                      key={key}
-                    />
-                  );
-                })}
+                <Route path="/pages/login-page" component={LoginPage} />
+                <Redirect to="/pages/login-page" />
               </Switch>
             </div>
-            <Footer transparent />
+            {/* <Footer transparent /> */}
             <div
               className="full-page-background"
               style={{ backgroundImage: "url(" + bgImage + ")" }}
