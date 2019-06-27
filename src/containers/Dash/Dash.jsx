@@ -124,7 +124,7 @@ class Dash extends Component {
                       />
                     );
                   } else {
-                    return (
+                    return !prop.component || (
                       <Route
                         path={prop.path}
                         component={prop.component}

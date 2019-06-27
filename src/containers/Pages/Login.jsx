@@ -31,6 +31,7 @@ class Pages extends Component {
     if (document.documentElement.className.indexOf("nav-open") !== -1) {
       document.documentElement.classList.toggle("nav-open");
     }
+    console.log('cwm login');
   }
   render() {
     return (

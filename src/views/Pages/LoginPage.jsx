@@ -9,22 +9,16 @@ import {
 } from "react-bootstrap";
 
 import Card from "components/Card/Card.jsx";
-
 import Button from "elements/CustomButton/CustomButton.jsx";
-import Checkbox from "elements/CustomCheckbox/CustomCheckbox.jsx";
 import Loader from "react-loader";
 import { useInput } from "../../hooks/input-hook";
+import axios from "axios";
+import { useStateValue } from "../../state";
 export default function LoginPage() {
   const [cardHidden, setCardHidden] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  useEffect(() => {
-    setTimeout(
-      function() {
-        setCardHidden(false);
-      }.bind(this),
-      700
-    );
-  }, []);
+  const [isError, setIsError] = useState(false);
+  const [, dispatch] = useStateValue();
   const {
     value: username,
     bind: bindUsername,
@@ -35,11 +29,38 @@ export default function LoginPage() {
     bind: bindPassword,
     reset: resetPassword
   } = useInput("");
+  useEffect(() => {
+    let timeout = setTimeout(
+      function() {
+        setCardHidden(false);
+      }.bind(this),
+      700
+    );
+    return () => clearTimeout(timeout);
+  }, []);
+  useEffect(() => {
+    setIsError(false);
+    return () => setIsError(false);
+  }, [username, password]);
+  const handleLogin = async e => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      let res = await axios.post("/api/user/signIn", { username, password });
+      if (res.status === 200) {
+        sessionStorage.setItem("token",res.token);
+        dispatch({ type: "LOGIN", token: res.token });
+      }
+    } catch (err) {
+      setIsError(true);
+      setIsLoading(false);
+    }
+  };
   return (
     <Grid>
       <Row>
         <Col md={4} sm={6} mdOffset={4} smOffset={3}>
-          <form>
+          <form onSubmit={handleLogin}>
             <Card
               hidden={cardHidden}
               textCenter
@@ -63,11 +84,20 @@ export default function LoginPage() {
                         type="password"
                       />
                     </FormGroup>
+                    {!isError || (
+                      <p className="text-danger">Sai tài khoản hoặc mật khẩu</p>
+                    )}
                   </Loader>
                 </div>
               }
               legend={
-                <Button disabled={isLoading} bsStyle="info" fill wd>
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  bsStyle="info"
+                  fill
+                  wd
+                >
                   Đăng nhập
                 </Button>
               }

@@ -19,20 +19,18 @@ import VectorMap from 'views/Maps/VectorMap.jsx';
 import Charts from 'views/Charts/Charts.jsx';
 import Calendar from 'views/Calendar/Calendar.jsx';
 import UserPage from 'views/Pages/UserPage.jsx';
-
+import AddManu from '../views/Manufacturer/AddManu';
+import EditManu from '../views/Manufacturer/EditManu';
+import ListManu from '../views/Manufacturer/ListManu';
 import pagesRoutes from './pages.jsx';
 
 var pages = [{ path: "/pages/user-page", name: "User Page", mini: "UP", component: UserPage }].concat(pagesRoutes);
 
 var dashRoutes = [
-    { collapse: true, path: "/sanpham", name: "Sản phẩm", state: "openComponents", icon: "pe-7s-plugin", views:[
-        { path: "/sanpham/danhsach", name: "Danh sách", mini: "B", component: Buttons },
-        { path: "/components/grid-system", name: "Grid System", mini: "GS", component: GridSystem },
-        { path: "/components/panels", name: "Panels", mini: "P", component: Panels },
-        { path: "/components/sweet-alert", name: "Sweet Alert", mini: "SA", component: SweetAlert },
-        { path: "/components/notifications", name: "Notifications", mini: "N", component: Notifications },
-        { path: "/components/icons", name: "Icons", mini: "I", component: Icons },
-        { path: "/components/typography", name: "Typography", mini: "T", component: Typography }]
+    { collapse: true, path: "/thuonghieu", name: "Thương hiệu", state: "openThuonghieu", icon: "pe-7s-album", views:[
+        { path: "/thuonghieu/them", name: "Thêm", mini: "T", component: AddManu },
+        { path: "/thuonghieu/danhsach/sua", name: "Sửa", mini: "S", component: EditManu, isEdit:true },
+        { path: "/thuonghieu/danhsach", name: "Danh sách", mini: "DS", component: ListManu }]
     },
     { path: "/dashboard", name: "Dashboard", icon: "pe-7s-graph", component: Dashboard },
     { collapse: true, path: "/components", name: "Components", state: "openComponents", icon: "pe-7s-plugin", views:[
@@ -62,9 +60,6 @@ var dashRoutes = [
     },
     { path: "/charts", name: "Charts", icon: "pe-7s-graph1", component: Charts },
     { path: "/calendar", name: "Calendar", icon: "pe-7s-date", component: Calendar },
-    { collapse: true, path: "/pages", name: "Pages", state: "openPages", icon:"pe-7s-gift", views:
-        pages
-    },
     { redirect: true, path: "/", pathTo: "/dashboard", name: "Dashboard" }
 ];
 export default dashRoutes;

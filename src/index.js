@@ -10,8 +10,10 @@ import "./assets/css/bootstrap.min.css";
 import "./assets/sass/light-bootstrap-dashboard.css";
 import "./assets/css/demo.css";
 import "./assets/css/pe-icon-7-stroke.css";
-import Axios from "axios";
+import axios from "axios";
 import { deepStrictEqual } from "assert";
+
+axios.defaults.baseURL = 'http://localhost:3000';
 
 const App = () => {
   const initialState = {
@@ -73,7 +75,7 @@ const Test = () => {
     let data = {
       name: "123"
     };
-    let res = await Axios.post(
+    let res = await axios.post(
       "http://localhost:3000/api/user/uploadAvatar",
       fd
     );
