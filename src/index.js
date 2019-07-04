@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-
+import dotenv from 'dotenv'
 import indexRoutes from "./routes/index.jsx";
 import { StateProvider, useStateValue } from "./state";
 import registerServiceWorker from "./registerServiceWorker";
@@ -10,16 +10,17 @@ import "./assets/css/bootstrap.min.css";
 import "./assets/sass/light-bootstrap-dashboard.css";
 import "./assets/css/demo.css";
 import "./assets/css/pe-icon-7-stroke.css";
+import "./assets/css/style.css";
 import axios from "axios";
 import { deepStrictEqual } from "assert";
-
-axios.defaults.baseURL = 'http://localhost:3000';
-
+import store from "store"
+dotenv.config();
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 const App = () => {
   const initialState = {
     app: {
       token: "",
-      isLogin: sessionStorage.getItem("token") ? true : false
+      isLogin: store.get("token") ? true : false
     },
     profile: {}
   };
@@ -76,7 +77,7 @@ const Test = () => {
       name: "123"
     };
     let res = await axios.post(
-      "http://localhost:3000/api/user/uploadAvatar",
+      "/api/user/uploadAvatar",
       fd
     );
     console.log(res.data);

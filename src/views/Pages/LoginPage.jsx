@@ -14,6 +14,7 @@ import Loader from "react-loader";
 import { useInput } from "../../hooks/input-hook";
 import axios from "axios";
 import { useStateValue } from "../../state";
+import store from "store";
 export default function LoginPage() {
   const [cardHidden, setCardHidden] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +49,8 @@ export default function LoginPage() {
     try {
       let res = await axios.post("/api/user/signIn", { username, password });
       if (res.status === 200) {
-        sessionStorage.setItem("token",res.token);
+        store.set("token", res.data.token);
+        console.log(store.get("token"));
         dispatch({ type: "LOGIN", token: res.token });
       }
     } catch (err) {

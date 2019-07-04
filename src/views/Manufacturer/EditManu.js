@@ -1,399 +1,176 @@
-import React, { Component } from 'react';
-import{
-    Grid, Row, Col,
-    FormGroup, ControlLabel, FormControl, HelpBlock, Form, InputGroup
-} from 'react-bootstrap';
+import React, { useState, useEffect } from "react";
+import {
+  Grid,
+  Row,
+  Col,
+  FormGroup,
+  ControlLabel,
+  FormControl,
+  Form
+} from "react-bootstrap";
 
-import Card from 'components/Card/Card.jsx';
-
-import Checkbox from 'elements/CustomCheckbox/CustomCheckbox.jsx';
-import Button from 'elements/CustomButton/CustomButton.jsx';
-import Radio from 'elements/CustomRadio/CustomRadio.jsx';
-
-class RegularForms extends Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            radio: "1",
-            radioVariant: "1"
-        };
+import Card from "components/Card/Card.jsx";
+import Button from "@material-ui/core/Button";
+import { withRouter, Link } from "react-router-dom";
+import axios from "axios";
+import Reply from "@material-ui/icons/Reply";
+import Loader from "react-loader";
+import Swal from "sweetalert2";
+import { IMG_MANU_URL, IMG_NO_URL } from "config";
+export default withRouter(function EditManu(props) {
+  const { history, match } = props;
+  let fileInput = React.createRef();
+  const [fileUpload, setFileUpload] = useState("");
+  const [srcImage, setSrcImage] = useState("");
+  const [nameImage, setNameImage] = useState("");
+  const [name, setName] = useState("");
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const handleFileChange = e => {
+    setFileUpload(e.target.files[0]);
+    console.log(e.target.files);
+    if (e.target.files[0]) {
+      setNameImage(e.target.files[0].name);
+      let reader = new FileReader();
+      reader.onload = e => {
+        setSrcImage(e.target.result);
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    } else {
+      setSrcImage("");
+      setNameImage("");
     }
-    handleRadio = event => {
-        const target = event.target;
-        this.setState({
-            [target.name]: target.value
+  };
+  const handleNameChange = e => {
+    setName(e.target.value);
+  };
+  const handleSubmit = async e => {
+    console.log("sumit");
+    e.preventDefault();
+    try {
+      await setIsLoading(true);
+      var fd = new FormData();
+      fd.append("_id",match.params._id);
+      fd.append("name", name);
+      if (fileUpload) {
+        fd.append("manuImage", fileUpload, fileUpload.name);
+      }
+      let res_manu = await axios.put("/manufacturer", fd);
+      await setIsLoading(false);
+      if (res_manu.status == 200) {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000
         });
-    };
-    render(){
-        return (
-            <div className="main-content">
-                <Grid fluid>
-                    <Row>
-                        <Col md={6}>
-                            <Card
-                                title="Stacked Form"
-                                content={
-                                    <form>
-                                        <FormGroup>
-                                            <ControlLabel>
-                                                Email address
-                                            </ControlLabel>
-                                            <FormControl
-                                                placeholder="Enter email"
-                                                type="email"
-                                            />
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <ControlLabel>
-                                                Password
-                                            </ControlLabel>
-                                            <FormControl
-                                                placeholder="Password"
-                                                type="password"
-                                            />
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Checkbox
-                                                isChecked
-                                                number="1"
-                                                label="Subscribe to newsletter"
-                                            />
-                                        </FormGroup>
-                                        <Button bsStyle="info" fill>
-                                            Submit
-                                        </Button>
-                                    </form>
-                                }
-                            />
-                        </Col>
-                        <Col md={6}>
-                            <Card
-                                title="Horizontal Form"
-                                content={
-                                    <Form horizontal>
-                                        <FormGroup>
-                                            <ControlLabel className="col-md-3">
-                                                Email
-                                            </ControlLabel>
-                                            <Col md={9}>
-                                                <FormControl
-                                                    placeholder="Email"
-                                                    type="email"
-                                                />
-                                            </Col>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <ControlLabel className="col-md-3">
-                                                Password
-                                            </ControlLabel>
-                                            <Col md={9}>
-                                                <FormControl
-                                                    placeholder="Password"
-                                                    type="password"
-                                                />
-                                            </Col>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Col md={9} mdOffset={3}>
-                                                <Checkbox
-                                                    number="2"
-                                                    label="Remember me"
-                                                />
-                                            </Col>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Col md={9} mdOffset={3}>
-                                                <Button bsStyle="info" fill>
-                                                    Submit
-                                                </Button>
-                                            </Col>
-                                        </FormGroup>
-                                    </Form>
-                                }
-                            />
-                        </Col>
-                        <Col md={12}>
-                            <Card
-                                title={<legend>Form Elements</legend>}
-                                content={
-                                    <Form horizontal>
-                                        <fieldset>
-                                            <FormGroup>
-                                                <ControlLabel className="col-sm-2">
-                                                    With Help
-                                                </ControlLabel>
-                                                <Col sm={10}>
-                                                    <FormControl
-                                                        type="text"
-                                                    />
-                                                    <HelpBlock>Validation is based on string length.</HelpBlock>
-                                                </Col>
-                                            </FormGroup>
-                                        </fieldset>
-                                        <fieldset>
-                                            <FormGroup>
-                                                <ControlLabel className="col-sm-2">
-                                                    Password
-                                                </ControlLabel>
-                                                <Col sm={10}>
-                                                    <FormControl
-                                                        type="password"
-                                                    />
-                                                </Col>
-                                            </FormGroup>
-                                        </fieldset>
-                                        <fieldset>
-                                            <FormGroup>
-                                                <ControlLabel className="col-sm-2">
-                                                    Placeholder
-                                                </ControlLabel>
-                                                <Col sm={10}>
-                                                    <FormControl
-                                                        placeholder="placeholder"
-                                                        type="text"
-                                                    />
-                                                </Col>
-                                            </FormGroup>
-                                        </fieldset>
-                                        <fieldset>
-                                            <FormGroup>
-                                                <ControlLabel className="col-sm-2">
-                                                    Disabled
-                                                </ControlLabel>
-                                                <Col sm={10}>
-                                                    <FormControl
-                                                        placeholder="Disabled input here"
-                                                        type="text"
-                                                        disabled
-                                                    />
-                                                </Col>
-                                            </FormGroup>
-                                        </fieldset>
-                                        <fieldset>
-                                            <FormGroup>
-                                                <ControlLabel className="col-sm-2">
-                                                    Static control
-                                                </ControlLabel>
-                                                <Col sm={10}>
-                                                    <FormControl.Static>
-                                                        hello@creative-tim.com
-                                                    </FormControl.Static>
-                                                </Col>
-                                            </FormGroup>
-                                        </fieldset>
-                                        <fieldset>
-                                            <FormGroup>
-                                                <ControlLabel className="col-sm-2">
-                                                    Checkboxes and Radios
-                                                </ControlLabel>
-                                                <Col sm={10}>
-                                                    <Checkbox
-                                                        number="3"
-                                                        label="First Checkbox"
-                                                    />
-                                                    <Checkbox
-                                                        number="4"
-                                                        label="Second Checkbox"
-                                                    />
-                                                    <Radio
-                                                        number="5"
-                                                        option="1"
-                                                        name="radio"
-                                                        onChange={this.handleRadio}
-                                                        checked={this.state.radio === "1"}
-                                                        label="Checked"
-                                                    />
-                                                    <Radio
-                                                        number="6"
-                                                        option="2"
-                                                        name="radio"
-                                                        onChange={this.handleRadio}
-                                                        checked={this.state.radio === "2"}
-                                                        label="Unchecked"
-                                                    />
-                                                </Col>
-                                            </FormGroup>
-                                        </fieldset>
-                                        <fieldset>
-                                            <FormGroup>
-                                                <ControlLabel className="col-sm-2">
-                                                    Inline Checkboxes
-                                                </ControlLabel>
-                                                <Col sm={10}>
-                                                    <Checkbox
-                                                        inline
-                                                        number="7"
-                                                        label="a"
-                                                    />
-                                                    <Checkbox
-                                                        inline
-                                                        number="8"
-                                                        label="b"
-                                                    />
-                                                    <Checkbox
-                                                        inline
-                                                        number="9"
-                                                        label="c"
-                                                    />
-                                                </Col>
-                                            </FormGroup>
-                                        </fieldset>
-                                        <fieldset>
-                                            <legend>Input Variants</legend>
-                                            <FormGroup>
-                                                <ControlLabel className="col-sm-2">
-                                                    Custom Checkboxes & Radios
-                                                </ControlLabel>
-                                                <Col sm={4} smOffset={1}>
-                                                    <Checkbox
-                                                        number="10"
-                                                        label="Unchecked"
-                                                    />
-                                                    <Checkbox
-                                                        isChecked
-                                                        number="11"
-                                                        label="Checked"
-                                                    />
-                                                    <Checkbox
-                                                        disabled
-                                                        number="12"
-                                                        label="Disabled unchecked"
-                                                    />
-                                                    <Checkbox
-                                                        disabled
-                                                        isChecked
-                                                        number="13"
-                                                        label="Disabled checked"
-                                                    />
-                                                </Col>
-                                                <Col sm={5}>
-                                                    <Radio
-                                                        number="14"
-                                                        option="2"
-                                                        name="radioVariant"
-                                                        onChange={this.handleRadio}
-                                                        checked={this.state.radioVariant === "2"}
-                                                        label="Radio is off"
-                                                    />
-                                                    <Radio
-                                                        number="15"
-                                                        option="1"
-                                                        name="radioVariant"
-                                                        onChange={this.handleRadio}
-                                                        checked={this.state.radioVariant === "1"}
-                                                        label="Radio is on"
-                                                    />
-                                                    <Radio
-                                                        disabled
-                                                        number="16"
-                                                        option="4"
-                                                        name="radioVariantDisabled"
-                                                        label="Disabled radio off"
-                                                    />
-                                                    <Radio
-                                                        disabled
-                                                        number="17"
-                                                        option="3"
-                                                        name="radioVariantDisabled"
-                                                        checked
-                                                        label="Disabled radio on"
-                                                    />
-                                                </Col>
-                                            </FormGroup>
-                                        </fieldset>
-                                        <fieldset>
-                                            <FormGroup>
-                                                <ControlLabel className="col-sm-2">
-                                                    Input with success
-                                                </ControlLabel>
-                                                <Col sm={10}>
-                                                    <FormControl
-                                                        type="text"
-                                                        className="valid"
-                                                    />
-                                                </Col>
-                                            </FormGroup>
-                                        </fieldset>
-                                        <fieldset>
-                                            <FormGroup>
-                                                <ControlLabel className="col-sm-2">
-                                                    Input with error
-                                                </ControlLabel>
-                                                <Col sm={10}>
-                                                    <FormControl
-                                                        type="text"
-                                                        className="error"
-                                                    />
-                                                </Col>
-                                            </FormGroup>
-                                        </fieldset>
-                                        <fieldset>
-                                            <FormGroup>
-                                                <ControlLabel className="col-sm-2">
-                                                    Column sizing
-                                                </ControlLabel>
-                                                <Col sm={10}>
-                                                    <Row>
-                                                        <Col md={3}>
-                                                            <FormControl
-                                                                type="text"
-                                                                placeholder="md={3}"
-                                                            />
-                                                        </Col>
-                                                        <Col md={4}>
-                                                            <FormControl
-                                                                type="text"
-                                                                placeholder="md={4}"
-                                                            />
-                                                        </Col>
-                                                        <Col md={5}>
-                                                            <FormControl
-                                                                type="text"
-                                                                placeholder="md={5}"
-                                                            />
-                                                        </Col>
-                                                    </Row>
-                                                </Col>
-                                            </FormGroup>
-                                        </fieldset>
-                                        <fieldset>
-                                            <FormGroup>
-                                                <ControlLabel className="col-sm-2">
-                                                    Input groups
-                                                </ControlLabel>
-                                                <Col sm={3}>
-                                                    <InputGroup>
-                                                        <InputGroup.Addon>@</InputGroup.Addon>
-                                                        <FormControl
-                                                            type="text"
-                                                            placeholder="Username"
-                                                        />
-                                                    </InputGroup>
-                                                </Col>
-                                                <Col sm={3}>
-                                                    <InputGroup>
-                                                        <FormControl type="text" />
-                                                        <InputGroup.Addon>.00</InputGroup.Addon>
-                                                    </InputGroup>
-                                                </Col>
-                                                <Col sm={4}>
-                                                    <InputGroup>
-                                                        <InputGroup.Addon>$</InputGroup.Addon>
-                                                        <FormControl type="text" />
-                                                        <InputGroup.Addon>.00</InputGroup.Addon>
-                                                    </InputGroup>
-                                                </Col>
-                                            </FormGroup>
-                                        </fieldset>
-                                    </Form>
-                                }
-                            />
-                        </Col>
-                    </Row>
-                </Grid>
-            </div>
-        );
+        Toast.fire({
+          type: "success",
+          title: "Cập nhật thành công"
+        });
+        history.push("/sanpham/thuonghieu/danhsach");
+      }
+    } catch (err) {
+      setIsError(true);
+      setIsLoading(false);
     }
-}
-
-export default RegularForms;
+  };
+  useEffect(() => {
+    async function fetchManu() {
+      try{
+        let res = await axios.get("/manufacturer/"+match.params._id);
+        setName(res.data.name);
+        setSrcImage(res.data.image==""?IMG_NO_URL:IMG_MANU_URL+res.data.image);
+      }catch(err){
+        console.log(err);
+      }
+    }
+    fetchManu();
+  }, []);
+  useEffect(() => {
+    setIsError(false);
+  }, [name, fileUpload]);
+  return (
+    <div className="main-content">
+      <Grid fluid>
+        <Row>
+          <Col md={12}>
+            <Card
+              title={
+                <div>
+                  <Button onClick={() => history.goBack()} variant="contained">
+                    <Reply />
+                  </Button>
+                  <legend style={{ marginTop: "10px" }}>
+                    Cập nhật thương hiệu
+                  </legend>
+                </div>
+              }
+              content={
+                <Form onSubmit={handleSubmit} horizontal>
+                  <fieldset>
+                    <FormGroup>
+                      <ControlLabel className="col-sm-2">
+                        Tên thương hiệu
+                      </ControlLabel>
+                      <Col sm={10}>
+                        <FormControl
+                          onChange={handleNameChange}
+                          value={name}
+                          type="text"
+                        />
+                      </Col>
+                    </FormGroup>
+                  </fieldset>
+                  <fieldset>
+                    <FormGroup>
+                      <ControlLabel className="col-sm-2">Hình ảnh</ControlLabel>
+                      <Col sm={10}>
+                        <input
+                          ref={fileInput}
+                          style={{ display: "none" }}
+                          type="file"
+                          onChange={handleFileChange}
+                        />
+                        <Button
+                          variant="contained"
+                          onClick={() => {
+                            fileInput.current.click();
+                          }}
+                        >
+                          Chọn
+                        </Button>
+                        <div style={{ width: "200px" }}>
+                          <img style={{ width: "100%" }} src={srcImage} />
+                        </div>
+                        <div>
+                          <p>{nameImage}</p>
+                        </div>
+                        {!isError || (
+                          <div>
+                            <p className="text-danger">
+                              Có lỗi xảy ra, vui lòng thử lại
+                            </p>
+                          </div>
+                        )}
+                        <Loader loaded={!isLoading}>
+                          <Button
+                            variant="contained"
+                            type="submit"
+                            color="primary"
+                          >
+                            Cập nhật
+                          </Button>
+                        </Loader>
+                      </Col>
+                    </FormGroup>
+                  </fieldset>
+                </Form>
+              }
+            />
+          </Col>
+        </Row>
+      </Grid>
+    </div>
+  );
+});

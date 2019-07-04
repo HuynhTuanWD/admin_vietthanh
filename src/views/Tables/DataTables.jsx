@@ -11,9 +11,6 @@ import Card from 'components/Card/Card.jsx';
 require('datatables.net-responsive');
 $.DataTable = require('datatables.net-bs');
 
-
-
-
 const dataTable = {
     headerRow: [ 'Name', 'Position', 'Office', 'Age', 'Date', 'Actions' ],
     footerRow: [ 'Name', 'Position', 'Office', 'Age', 'Date', 'Actions' ],
@@ -32,32 +29,6 @@ const dataTable = {
         ['Doris Wilder', 'John Doe', 'Design', '2012', '89,241'],
         ['Fiona Green', 'Alex Mike', 'Design', '2010', '92,144'],
         ['Garrett Winters','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Gavin Cortez', 'Paul Dickens', 'Communication', '2015', '69,201'],
-        ['Gavin Joyce','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Gloria Little','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Haley Kennedy','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Herrod Chandler','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Hope Fuentes','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Howard Hatfield', 'Andrew Mike', 'Develop', '2013', '99,225'],
-        ['Jena Gaines', 'John Doe', 'Design', '2012', '89,241'],
-        ['Jenette Caldwell', 'Alex Mike', 'Design', '2010', '92,144'],
-        ['Jennifer Chang','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Martena Mccray', 'Paul Dickens', 'Communication', '2015', '69,201'],
-        ['Michael Silva','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Michelle House','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Paul Byrd','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Prescott Bartlett','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Quinn Flynn','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Rhona Davidson', 'Andrew Mike', 'Develop', '2013', '99,225'],
-        ['Shou Itou', 'John Doe', 'Design', '2012', '89,241'],
-        ['Sonya Frost', 'Alex Mike', 'Design', '2010', '92,144'],
-        ['Suki Burks','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Tatyana Fitzpatrick', 'Paul Dickens', 'Communication', '2015', '69,201'],
-        ['Tiger Nixon','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Timothy Mooney','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Unity Butler','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Vivian Harrell','Mike Monday', 'Marketing', '2013', '49,990'],
-        ['Yuri Berry','Mike Monday', 'Marketing', '2013', '49,990']
     ]
 };
 

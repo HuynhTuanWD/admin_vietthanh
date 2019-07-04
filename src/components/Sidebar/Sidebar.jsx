@@ -168,7 +168,7 @@ class Sidebar extends Component {
                       <ul className="nav">
                         {prop.views.map(
                           (prop, key) =>
-                            prop.isEdit || (
+                            prop.isHidden || (
                               <li
                                 className={this.activeRoute(prop.path)}
                                 key={key}

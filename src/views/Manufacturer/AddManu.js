@@ -6,23 +6,25 @@ import {
   FormGroup,
   ControlLabel,
   FormControl,
-  HelpBlock,
-  Form,
-  InputGroup
+  Form
 } from "react-bootstrap";
 
 import Card from "components/Card/Card.jsx";
-import Button from "elements/CustomButton/CustomButton.jsx";
-import { withRouter } from "react-router-dom";
+import Button from "@material-ui/core/Button";
+import { withRouter, Link } from "react-router-dom";
 import axios from "axios";
-import { deepStrictEqual } from "assert";
-export default withRouter(function AddManu() {
+import Reply from "@material-ui/icons/Reply";
+import Loader from "react-loader";
+import Swal from "sweetalert2";
+export default withRouter(function AddManu(props) {
   let fileInput = React.createRef();
   const [fileUpload, setFileUpload] = useState("");
   const [srcImage, setSrcImage] = useState("");
   const [nameImage, setNameImage] = useState("");
   const [name, setName] = useState("");
   const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { history } = props;
   const handleFileChange = e => {
     setFileUpload(e.target.files[0]);
     console.log(e.target.files);
@@ -45,18 +47,30 @@ export default withRouter(function AddManu() {
     console.log("sumit");
     e.preventDefault();
     try {
-      let res = await axios.post("/api/manufacturer", { name });
-      if (fileUpload && res.data._id) {
-        console.log("voday");
-        let fd = new FormData();
-        fd.append("_id",res.data._id);
-        console.log(fileUpload);
-        fd.append("manuImage",fileUpload,fileUpload.name);
-        await axios.post("/api/manufacturer/image",fd);
+      await setIsLoading(true);
+      var fd = new FormData();
+      fd.append("name", name);
+      if (fileUpload) {
+        fd.append("manuImage", fileUpload, fileUpload.name);
       }
-
+      let res_manu = await axios.post("/manufacturer",fd);
+      await setIsLoading(false);
+      if (res_manu.status == 200) {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000
+        });
+        Toast.fire({
+          type: "success",
+          title: "Thêm thành công"
+        });
+        history.push("/sanpham/thuonghieu/danhsach");
+      }
     } catch (err) {
       setIsError(true);
+      setIsLoading(false);
     }
   };
   useEffect(() => {
@@ -68,7 +82,16 @@ export default withRouter(function AddManu() {
         <Row>
           <Col md={12}>
             <Card
-              title={<legend>Thêm thương hiệu</legend>}
+              title={
+                <div>
+                  <Button onClick={() => history.goBack()} variant="contained">
+                    <Reply />
+                  </Button>
+                  <legend style={{ marginTop: "10px" }}>
+                    Thêm thương hiệu
+                  </legend>
+                </div>
+              }
               content={
                 <Form onSubmit={handleSubmit} horizontal>
                   <fieldset>
@@ -96,7 +119,7 @@ export default withRouter(function AddManu() {
                           onChange={handleFileChange}
                         />
                         <Button
-                          className="btn-fill"
+                          variant="contained"
                           onClick={() => {
                             fileInput.current.click();
                           }}
@@ -111,12 +134,20 @@ export default withRouter(function AddManu() {
                         </div>
                         {!isError || (
                           <div>
-                            <p>Có lỗi xảy ra</p>
+                            <p className="text-danger">
+                              Có lỗi xảy ra, vui lòng thử lại
+                            </p>
                           </div>
                         )}
-                        <Button type="submit" bsStyle="primary" fill wd>
-                          Thêm
-                        </Button>
+                        <Loader loaded={!isLoading}>
+                          <Button
+                            variant="contained"
+                            type="submit"
+                            color="primary"
+                          >
+                            Thêm
+                          </Button>
+                        </Loader>
                       </Col>
                     </FormGroup>
                   </fieldset>

@@ -22,15 +22,19 @@ import UserPage from 'views/Pages/UserPage.jsx';
 import AddManu from '../views/Manufacturer/AddManu';
 import EditManu from '../views/Manufacturer/EditManu';
 import ListManu from '../views/Manufacturer/ListManu';
+import Test from '../views/Manufacturer/Test';
+import Tree from "../views/Manufacturer/Tree";
 import pagesRoutes from './pages.jsx';
 
 var pages = [{ path: "/pages/user-page", name: "User Page", mini: "UP", component: UserPage }].concat(pagesRoutes);
 
 var dashRoutes = [
-    { collapse: true, path: "/thuonghieu", name: "Thương hiệu", state: "openThuonghieu", icon: "pe-7s-album", views:[
-        { path: "/thuonghieu/them", name: "Thêm", mini: "T", component: AddManu },
-        { path: "/thuonghieu/danhsach/sua", name: "Sửa", mini: "S", component: EditManu, isEdit:true },
-        { path: "/thuonghieu/danhsach", name: "Danh sách", mini: "DS", component: ListManu }]
+    { collapse: true, path: "/sanpham", name: "Sản phẩm", state: "openThuonghieu", icon: "pe-7s-album", views:[
+        { path: "/sanpham/thuonghieu/danhsach/them", name: "Thêm", mini: "T", component: AddManu,isHidden:true },
+        { path: "/sanpham/thuonghieu/danhsach/capnhat/:_id", name: "Cập nhật", mini: "S", component: EditManu, isHidden:true },
+        { path: "/sanpham/thuonghieu/danhsach", name: "Thương hiệu", mini: "DS", component: ListManu },
+        { path: "/sanpham/thuonghieu/test", name: "Test", mini: "TE", component: Test },
+        { path: "/sanpham/thuonghieu/tree", name: "Tree", mini: "TE", component: Tree }]
     },
     { path: "/dashboard", name: "Dashboard", icon: "pe-7s-graph", component: Dashboard },
     { collapse: true, path: "/components", name: "Components", state: "openComponents", icon: "pe-7s-plugin", views:[
