@@ -1,0 +1,6 @@
+.fixscroll {
+  position: relative;
+  float: right;
+  width: calc(100% - 260px);
+  min-height: 100%;
+}

@@ -5,7 +5,6 @@ import SortableTree, {
   addNodeUnderParent,
   removeNodeAtPath,
   changeNodeAtPath,
-  getNodeAtPath
 } from "react-sortable-tree";
 import "react-sortable-tree/style.css"; // This only needs to be imported once in your app
 import axios from "axios";
@@ -18,11 +17,16 @@ import SaveIcon from "@material-ui/icons/Save";
 import Tooltip from "@material-ui/core/Tooltip";
 import Fab from "@material-ui/core/Fab";
 import Checkbox from "@material-ui/core/Checkbox";
+import $ from "jquery";
+import "assets/css/fixscroll.css";
 export default function Tree(props) {
   const [treeCategories, setTreeCategories] = useState([]);
   const [addAsFirstChild, setAddAsFirstChild] = useState(false);
   const getNodeKey = ({ treeIndex }) => treeIndex;
   useEffect(() => {
+    $(".main-panel")
+      .removeClass("main-panel")
+      .addClass("fixscroll");
     async function fetchCategories() {
       let res = await axios.get("/categories");
       let treeData = getTreeFromFlatData({
@@ -63,9 +67,15 @@ export default function Tree(props) {
       })
     );
   };
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 3000
+  });
   return (
     <div>
-      ↓treeData for this tree was generated from flat data similar to DB rows↓
+      {/* ↓treeData for this tree was generated from flat data similar to DB rows↓ */}
       <div style={{ height: 400 }}>
         <SortableTree
           treeData={treeCategories}
@@ -162,12 +172,6 @@ export default function Tree(props) {
                     confirmButtonText: "Xóa!",
                     cancelButtonText: "Hủy"
                   }).then(async result => {
-                    const Toast = Swal.mixin({
-                      toast: true,
-                      position: "top-end",
-                      showConfirmButton: false,
-                      timer: 3000
-                    });
                     if (result.value) {
                       try {
                         let category_ids = getFlatDataFromNode([node]).map(
@@ -204,48 +208,82 @@ export default function Tree(props) {
         />
       </div>
       <hr />
-      ↓This flat data is generated from the modified tree data↓
-      <ul>
+      {/* ↓This flat data is generated from the modified tree data↓ */}
+      {/* <ul>
         {getFlatDataFromNode(treeCategories).map(({ id, title, parent }) => (
           <li key={id}>
             id: {id}, title: {title}, parent: {parent || "null"}
           </li>
         ))}
-      </ul>
-      <Tooltip
-        onClick={async () => {
-          let res = await axios.post("/category", { title: "" });
-          let _id = res.data;
-          addAsFirstChild
-            ? setTreeCategories([
-                { id: _id, title: "", parent: null },
-                ...treeCategories
-              ])
-            : setTreeCategories([
-                ...treeCategories,
-                { id: _id, title: "", parent: null }
-              ]);
-        }}
-        title="Thêm"
-        aria-label="Add"
-      >
-        <Fab size="small" color="primary">
-          <AddIcon />
-        </Fab>
-      </Tooltip>
-      <br />
-      <label htmlFor="addAsFirstChild">
-        <Checkbox
-          checked={addAsFirstChild}
-          onChange={() => setAddAsFirstChild(!addAsFirstChild)}
-          value=""
-          color="primary"
-          inputProps={{
-            "aria-label": "secondary checkbox"
+      </ul> */}
+      <div style={{ marginLeft: 30 }}>
+        <Tooltip
+          onClick={async () => {
+            let res = await axios.post("/category", { title: "" });
+            let _id = res.data;
+            addAsFirstChild
+              ? setTreeCategories([
+                  { id: _id, title: "", parent: null },
+                  ...treeCategories
+                ])
+              : setTreeCategories([
+                  ...treeCategories,
+                  { id: _id, title: "", parent: null }
+                ]);
           }}
-        />
-        <span style={{ paddingLeft: 5 }}>Thêm vào đầu danh sách</span>
-      </label>
+          title="Thêm"
+          aria-label="Add"
+        >
+          <Fab size="small" color="primary">
+            <AddIcon />
+          </Fab>
+        </Tooltip>
+        <Tooltip
+          onClick={async () => {
+            let categories = getFlatDataFromNode(treeCategories).map(
+              ({ id, title, parent },key) => ({
+                _id:id,
+                title,
+                parent,
+                order:key+1
+              })
+            );
+            let res = await axios.post("/categories",{categories});
+            if(res.status==200){
+              Toast.fire({
+                type: "success",
+                title: "Lưu thành công!"
+              });
+            }else{
+              Toast.fire({
+                type: "warning",
+                title: "Có lỗi xảy ra vui lòng kiểm tra đường truyền!"
+              });
+            }
+          }}
+          style={{ marginLeft: 10 }}
+          color="secondary"
+          title="Lưu thao tác"
+          aria-label="Save"
+        >
+          <Fab size="small">
+            <SaveIcon />
+          </Fab>
+        </Tooltip>
+        <br />
+        <label htmlFor="addAsFirstChild">
+          <Checkbox
+            checked={addAsFirstChild}
+            onChange={() => setAddAsFirstChild(!addAsFirstChild)}
+            value=""
+            color="primary"
+            inputProps={{
+              "aria-label": "secondary checkbox"
+            }}
+          />
+          <span style={{ paddingLeft: 5 }}>Thêm vào đầu danh sách</span>
+        </label>
+      </div>
     </div>
   );
 }
