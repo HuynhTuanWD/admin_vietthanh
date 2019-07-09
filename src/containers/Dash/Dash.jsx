@@ -9,7 +9,7 @@ import NotificationSystem from "react-notification-system";
 import Sidebar from "components/Sidebar/Sidebar.jsx";
 import Header from "components/Header/Header.jsx";
 import Footer from "components/Footer/Footer.jsx";
-
+import {withRouter} from 'react-router-dom';
 // dinamically create dashboard routes
 import dashRoutes from "routes/dash.jsx";
 // style for notifications
@@ -98,10 +98,10 @@ class Dash extends Component {
         <Sidebar {...this.props} />
         <div
           className={
-            "main-panel" +
+            (this.props.location.pathname=="/sanpham/danhmuc"?"fixscroll":"main-panel") +
             (this.props.location.pathname === "/maps/full-screen-maps"
               ? " main-panel-maps"
-              : "")
+              : "") + " ps"
           }
           ref="mainPanel"
         >
@@ -156,4 +156,4 @@ class Dash extends Component {
   }
 }
 
-export default Dash;
+export default withRouter(props => <Dash {...props}/>);;

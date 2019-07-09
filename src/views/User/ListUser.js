@@ -7,15 +7,15 @@ import Tooltip from "@material-ui/core/Tooltip";
 import AddIcon from "@material-ui/icons/Add";
 import Fab from "@material-ui/core/Fab";
 import axios from "axios";
-import { IMG_MANU_URL, IMG_NO_URL } from "config";
+import { IMG_AVATAR_URL, IMG_NO_AVATAR } from "config";
 export default withRouter(function ListManu(props) {
   const { history } = props;
-  const [manuData, setManuData] = useState([]);
+  const [userData, setUserData] = useState([]);
   useEffect(() => {
     async function fetchManu() {
       try {
-        let res = await axios.get("/manufacturers");
-        setManuData(res.data);
+        let res = await axios.get("/users");
+        setUserData(res.data);
       } catch (err) {
         console.log(err);
       }
@@ -30,7 +30,7 @@ export default withRouter(function ListManu(props) {
             <MaterialTable
               title={
                 <div>
-                  <Link to="/sanpham/thuonghieu/danhsach/them">
+                  <Link to="/hethong/taikhoan/danhsach/them">
                     <Tooltip title="Thêm" aria-label="Add">
                       <Fab size="small" color="primary">
                         <AddIcon />
@@ -43,28 +43,34 @@ export default withRouter(function ListManu(props) {
               columns={[
                 {
                   title: "Hình ảnh",
-                  field: "image",
+                  field: "avatar",
                   render: rowData => (
                     <img
                       src={
-                        rowData.image == ""
-                          ? IMG_NO_URL
-                          : IMG_MANU_URL + rowData.image
+                        rowData.avatar == ""
+                          ? IMG_NO_AVATAR
+                          : IMG_AVATAR_URL + rowData.avatar
                       }
                       style={{ height: 20 }}
                     />
                   )
                 },
-                { title: "Tên", field: "name" }
+                { title: "Tên", field: "name" },
+                { title: "Tài khoản", field: "username" },
+                {
+                  title: "Quyền hạn",
+                  field: "role",
+                  render: rowData => (rowData.role === 1 ? "Admin" : "")
+                }
               ]}
-              data={manuData}
+              data={userData}
               actions={[
                 {
                   icon: "edit",
                   tooltip: "Sửa",
                   onClick: (event, rowData) =>
                     history.push(
-                      "/sanpham/thuonghieu/danhsach/capnhat/" + rowData._id
+                      "/hethong/taikhoan/danhsach/capnhat/" + rowData._id
                     )
                 },
                 rowData => ({
@@ -89,11 +95,11 @@ export default withRouter(function ListManu(props) {
                       });
                       if (result.value) {
                         try {
-                          await axios.delete("/manufacturer/" + rowData._id);
-                          let newData = manuData.filter(
+                          await axios.delete("/user/" + rowData._id);
+                          let newData = userData.filter(
                             item => item._id !== rowData._id
                           );
-                          await setManuData(newData);
+                          await setUserData(newData);
                           Toast.fire({
                             type: "success",
                             title: "Xóa thành công!"

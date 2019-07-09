@@ -8,7 +8,7 @@ import AddIcon from "@material-ui/icons/Add";
 import Fab from "@material-ui/core/Fab";
 import axios from "axios";
 import { IMG_MANU_URL, IMG_NO_URL } from "config";
-export default withRouter(function ListManu(props) {
+export default withRouter(function ListProduct(props) {
   const { history } = props;
   const [manuData, setManuData] = useState([]);
   useEffect(() => {
@@ -30,7 +30,7 @@ export default withRouter(function ListManu(props) {
             <MaterialTable
               title={
                 <div>
-                  <Link to="/sanpham/thuonghieu/danhsach/them">
+                  <Link to="/sanpham/sanpham/danhsach/them">
                     <Tooltip title="Thêm" aria-label="Add">
                       <Fab size="small" color="primary">
                         <AddIcon />
@@ -64,7 +64,7 @@ export default withRouter(function ListManu(props) {
                   tooltip: "Sửa",
                   onClick: (event, rowData) =>
                     history.push(
-                      "/sanpham/thuonghieu/danhsach/capnhat/" + rowData._id
+                      "/sanpham/sanpham/danhsach/capnhat/" + rowData._id
                     )
                 },
                 rowData => ({
