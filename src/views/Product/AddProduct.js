@@ -58,7 +58,7 @@ export default withRouter(function AddProduct(props) {
   let file2 = React.createRef();
   let file3 = React.createRef();
   let file4 = React.createRef();
-  const [fileUpload, setFileUpload] = useState("");
+  const [fileUpload, setFileUpload] = useState(["", "", "", ""]);
   const [srcImage1, setSrcImage1] = useState("");
   const [nameImage1, setNameImage1] = useState("");
   const [srcImage2, setSrcImage2] = useState("");
@@ -76,14 +76,19 @@ export default withRouter(function AddProduct(props) {
   const [_categories, set_categories] = useState([]);
   const [_manufacturer, set_manufacturer] = useState(null);
   const [quantity, setQuantity] = useState(0);
-  const [categoryOptions, setCategoryOptions] = useState([]);
-  const [manufacturerOptions, setManufacturerOptions] = useState([]);
-  const [colors, setColors] = useState([]);
-  const [isError, setIsError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [_departments, set_departments] = useState([]);
   const [shortDescription, setShortDescription] = useState(null);
   const [description, setDescription] = useState(null);
   const [technicalSpec, setTechnicalSpec] = useState(null);
+
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [manufacturerOptions, setManufacturerOptions] = useState([]);
+  const [departmentOptions, setDepartmentOptions] = useState([]);
+  const [colors, setColors] = useState([]);
+
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const { history } = props;
 
   useEffect(() => {
@@ -103,14 +108,23 @@ export default withRouter(function AddProduct(props) {
       let res = await axios.get("/colors");
       setColors(_.map(res.data, e => ({ ...e, checked: true })));
     }
+    async function fetchDepartments() {
+      let res = await axios.get("/departments");
+      setDepartmentOptions(
+        res.data.map(item => ({ label: item.address, value: item._id }))
+      );
+    }
     fetchCategoryOptions();
     fetchManuOptions();
     fetchColors();
+    fetchDepartments();
   }, []);
 
-  const handleFileChange = (e, setNameImage, setSrcImage) => {
-    setFileUpload(e.target.files[0]);
-    console.log(e.target.files);
+  const handleFileChange = (e, setNameImage, setSrcImage, th) => {
+    // setFileUpload(e.target.files[0]);
+    setFileUpload(
+      fileUpload.map((item, idx) => (idx === th ? e.target.files[0] : item))
+    );
     if (e.target.files[0]) {
       setNameImage(e.target.files[0].name);
       let reader = new FileReader();
@@ -126,36 +140,35 @@ export default withRouter(function AddProduct(props) {
   const handleSubmit = async e => {
     console.log("sumit");
     e.preventDefault();
-    try {
-      await setIsLoading(true);
-      var fd = new FormData();
-      fd.append("name", name);
-      if (fileUpload) {
-        fd.append("manuImage", fileUpload, fileUpload.name);
-      }
-      let res_manu = await axios.post("/manufacturer", fd);
-      await setIsLoading(false);
-      if (res_manu.status == 200) {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 3000
-        });
-        Toast.fire({
-          type: "success",
-          title: "Thêm thành công"
-        });
-        history.push("/sanpham/thuonghieu/danhsach");
-      }
-    } catch (err) {
-      setIsError(true);
-      setIsLoading(false);
-    }
+    // console.log(fileUpload.map((item, idx) => (item.type ? 1 : 0)));
+    // console.log(fileUpload);
+    // try {
+    //   await setIsLoading(true);
+    //   var fd = new FormData();
+    //   // fd.append("name", name);
+    //   for (let i = 0; i < fileUpload.length; i++) {
+    //     fd.append("productImages", fileUpload[i]);
+    //   }
+    //   let res = await axios.post("/product", fd);
+    //   await setIsLoading(false);
+    //   if (res.status == 200) {
+    //     const Toast = Swal.mixin({
+    //       toast: true,
+    //       position: "top-end",
+    //       showConfirmButton: false,
+    //       timer: 3000
+    //     });
+    //     Toast.fire({
+    //       type: "success",
+    //       title: "Thêm thành công"
+    //     });
+    //     // history.push("/sanpham/thuonghieu/danhsach");
+    //   }
+    // } catch (err) {
+    //   setIsError(true);
+    //   setIsLoading(false);
+    // }
   };
-  useEffect(() => {
-    setIsError(false);
-  }, [name, fileUpload]);
   return (
     <div className="main-content">
       <Grid fluid>
@@ -211,10 +224,11 @@ export default withRouter(function AddProduct(props) {
                     <div>
                       <input
                         ref={file1}
+                        name="productImages"
                         style={{ display: "none" }}
                         type="file"
                         onChange={e =>
-                          handleFileChange(e, setNameImage1, setSrcImage1)
+                          handleFileChange(e, setNameImage1, setSrcImage1, 0)
                         }
                       />
                       <Button
@@ -252,10 +266,11 @@ export default withRouter(function AddProduct(props) {
                     <div>
                       <input
                         ref={file2}
+                        name="productImages"
                         style={{ display: "none" }}
                         type="file"
                         onChange={e =>
-                          handleFileChange(e, setNameImage2, setSrcImage2)
+                          handleFileChange(e, setNameImage2, setSrcImage2, 1)
                         }
                       />
                       <Button
@@ -291,10 +306,11 @@ export default withRouter(function AddProduct(props) {
                     <div>
                       <input
                         ref={file3}
+                        name="productImages"
                         style={{ display: "none" }}
                         type="file"
                         onChange={e =>
-                          handleFileChange(e, setNameImage3, setSrcImage3)
+                          handleFileChange(e, setNameImage3, setSrcImage3, 2)
                         }
                       />
                       <Button
@@ -330,10 +346,11 @@ export default withRouter(function AddProduct(props) {
                     <div>
                       <input
                         ref={file4}
+                        name="productImages"
                         style={{ display: "none" }}
                         type="file"
                         onChange={e =>
-                          handleFileChange(e, setNameImage4, setSrcImage4)
+                          handleFileChange(e, setNameImage4, setSrcImage4, 3)
                         }
                       />
                       <Button
@@ -408,10 +425,7 @@ export default withRouter(function AddProduct(props) {
                   name="multipleSelect"
                   value={_categories}
                   options={categoryOptions}
-                  onChange={value => {
-                    console.log(value);
-                    set_categories(value);
-                  }}
+                  onChange={value => set_categories(_.map(value, "value"))}
                 />
               </FormGroup>
               <Row>
@@ -423,10 +437,7 @@ export default withRouter(function AddProduct(props) {
                       name="singleSelect"
                       value={_manufacturer}
                       options={manufacturerOptions}
-                      onChange={value => {
-                        console.log(value);
-                        set_manufacturer(value);
-                      }}
+                      onChange={value => set_manufacturer(value.value)}
                     />
                   </FormGroup>
                 </Col>
@@ -470,20 +481,14 @@ export default withRouter(function AddProduct(props) {
               <FormGroup>
                 <ControlLabel>Chi nhánh có hàng:</ControlLabel>
                 <Select
-                // placeholder="Multiple Select"
-                // closeOnSelect={false}
-                // multi={true}
-                // name="multipleSelect"
-                // value={this.state.multipleSelect}
-                // options={selectOptions}
-                // onChange={value => {
-                //   this.setState({ multipleSelect: value });
-                // }}
+                  placeholder="Chi nhánh có hàng"
+                  closeOnSelect={false}
+                  multi={true}
+                  name="multipleSelect"
+                  value={_departments}
+                  options={departmentOptions}
+                  onChange={value => set_departments(_.map(value, "value"))}
                 />
-              </FormGroup>
-              <FormGroup>
-                <ControlLabel>Từ khóa SEO:</ControlLabel>
-                <FormControl placeholder="Từ khóa SEO" type="text" />
               </FormGroup>
               <FormGroup>
                 <ControlLabel>Mô tả ngắn:</ControlLabel>
@@ -521,6 +526,13 @@ export default withRouter(function AddProduct(props) {
                   }}
                 />
               </FormGroup>
+              <div className="text-center">
+                <Loader loaded={!isLoading}>
+                  <Button variant="contained" type="submit" color="primary">
+                    Thêm
+                  </Button>
+                </Loader>
+              </div>
             </Form>
           }
         />

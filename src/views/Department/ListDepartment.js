@@ -20,7 +20,6 @@ import SaveIcon from "@material-ui/icons/Save";
 import ClearIcon from "@material-ui/icons/Clear";
 import axios from "axios";
 import { IMG_MANU_URL, IMG_NO_URL } from "config";
-import { ChromePicker } from "react-color";
 const Manu = withRouter(function ListManu(props) {
   const Toast = Swal.mixin({
     toast: true,
@@ -35,26 +34,28 @@ const Manu = withRouter(function ListManu(props) {
         case "GET_ALL":
           return {
             ...state,
-            colors: action.colors
+            departments: action.departments
           };
         case "ADD": {
           return {
             ...state,
-            colors: [action.color, ...state.colors]
+            departments: [action.department, ...state.departments]
           };
         }
         case "EDIT": {
           return {
             ...state,
-            colors: state.colors.map(item =>
-              item._id === action.color._id ? action.color : item
+            departments: state.departments.map(item =>
+              item._id === action.department._id ? action.department : item
             )
           };
         }
         case "DELETE": {
           return {
             ...state,
-            colors: state.colors.filter(item => item._id !== action._id)
+            departments: state.departments.filter(
+              item => item._id !== action._id
+            )
           };
         }
         default:
@@ -62,33 +63,34 @@ const Manu = withRouter(function ListManu(props) {
       }
     },
     {
-      colors: []
+      departments: []
     }
   );
   const [addState, setAddState] = useState({
-    color: {
-      hex: "#000000",
-      name: ""
+    department: {
+      name: "",
+      address: ""
     },
     isOpen: false
   });
   const handleAddChange = e => {
     setAddState({
       ...addState,
-      color: { ...addState.color, [e.target.name]: e.target.value }
+      department: { ...addState.department, [e.target.name]: e.target.value }
     });
   };
 
   const handleAddSubmit = async e => {
     e.preventDefault();
     try {
-      let res = await axios.post("/color", addState.color);
-      dispatch({ type: "ADD", color: res.data });
+      let res = await axios.post("/department", addState.department);
+      dispatch({ type: "ADD", department: res.data });
       Toast.fire({
         type: "success",
         title: "Thêm thành công"
       });
     } catch (err) {
+      console.log(err);
       Toast.fire({
         type: "warning",
         title: "Có lỗi xảy ra, vui lòng kiểm tra đường truyền!"
@@ -96,24 +98,27 @@ const Manu = withRouter(function ListManu(props) {
     }
   };
   let [editState, setEditState] = useState({
-    color: {
-      hex: "",
-      name: ""
+    department: {
+      name: "",
+      address: ""
     },
     isOpen: false
   });
   const handleEditChange = e => {
     setEditState({
       ...editState,
-      color: { ...editState.color, [e.target.name]: e.target.value }
+      department: { ...editState.department, [e.target.name]: e.target.value }
     });
   };
 
   const handleEditSubmit = async e => {
     e.preventDefault();
     try {
-      await axios.put("/color/" + editState.color._id, editState.color);
-      dispatch({ type: "EDIT", color: editState.data });
+      await axios.put(
+        "/department/" + editState.department._id,
+        editState.department
+      );
+      dispatch({ type: "EDIT", department: editState.data });
       Toast.fire({
         type: "success",
         title: "Cập nhật thành công"
@@ -128,8 +133,8 @@ const Manu = withRouter(function ListManu(props) {
   useEffect(() => {
     async function fetchManu() {
       try {
-        let res = await axios.get("/colors");
-        dispatch({ type: "GET_ALL", colors: res.data });
+        let res = await axios.get("/departments");
+        dispatch({ type: "GET_ALL", departments: res.data });
       } catch (err) {
         console.log(err);
       }
@@ -147,7 +152,7 @@ const Manu = withRouter(function ListManu(props) {
                   <Tooltip
                     onClick={() =>
                       setAddState({
-                        color: { name: "", hex: "#000" },
+                        department: { name: "", address: "" },
                         isOpen: true
                       })
                     }
@@ -162,28 +167,16 @@ const Manu = withRouter(function ListManu(props) {
                 </div>
               }
               columns={[
-                {
-                  title: "Màu",
-                  field: "hex",
-                  render: rowData => (
-                    <div
-                      style={{
-                        background: rowData.hex,
-                        width: "25px",
-                        height: "25px"
-                      }}
-                    />
-                  )
-                },
-                { title: "Tên màu", field: "name" }
+                { title: "Tên chi nhánh", field: "name" },
+                { title: "Địa chỉ", field: "address" }
               ]}
-              data={tableState.colors}
+              data={tableState.departments}
               actions={[
                 {
                   icon: "edit",
                   tooltip: "Sửa",
                   onClick: (event, rowData) =>
-                    setEditState({ color: rowData, isOpen: true })
+                    setEditState({ department: rowData, isOpen: true })
                 },
                 rowData => ({
                   icon: "delete",
@@ -207,7 +200,7 @@ const Manu = withRouter(function ListManu(props) {
                       });
                       if (result.value) {
                         try {
-                          await axios.delete("/color/" + rowData._id);
+                          await axios.delete("/department/" + rowData._id);
                           dispatch({ type: "DELETE", _id: rowData._id });
                           // let newData = manuData.filter(
                           //   item => item._id !== rowData._id
@@ -244,29 +237,27 @@ const Manu = withRouter(function ListManu(props) {
       >
         <Form onSubmit={handleAddSubmit}>
           <Modal.Header closeButton>
-            <Modal.Title id="modal_add">Thêm màu mặc định</Modal.Title>
+            <Modal.Title id="modal_add">Thêm chi nhánh</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <FormGroup>
-              <ControlLabel>Tên màu:</ControlLabel>
+              <ControlLabel>Tên chi nhánh:</ControlLabel>
               <input
-                value={addState.color.name}
+                value={addState.department.name}
                 onChange={handleAddChange}
                 className="form-control"
                 name="name"
-                placeholder="Tên màu"
+                placeholder="Tên chi nhánh"
               />
             </FormGroup>
             <FormGroup>
-              <ControlLabel>Chọn màu đàn:</ControlLabel>
-              <ChromePicker
-                color={addState.color.hex}
-                onChangeComplete={(color, event) => {
-                  setAddState({
-                    ...addState,
-                    color: { ...addState.color, hex: color.hex }
-                  });
-                }}
+              <ControlLabel>Địa chỉ:</ControlLabel>
+              <input
+                value={addState.department.address}
+                onChange={handleAddChange}
+                className="form-control"
+                name="address"
+                placeholder="Địa chỉ"
               />
             </FormGroup>
           </Modal.Body>
@@ -301,29 +292,27 @@ const Manu = withRouter(function ListManu(props) {
       >
         <Form onSubmit={handleEditSubmit}>
           <Modal.Header closeButton>
-            <Modal.Title id="modal_add">Cập nhật màu mặc định</Modal.Title>
+            <Modal.Title id="modal_add">Cập nhật chi nhánh</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <FormGroup>
-              <ControlLabel>Tên màu:</ControlLabel>
+              <ControlLabel>Tên chi nhánh:</ControlLabel>
               <input
-                value={editState.color.name}
+                value={editState.department.name}
                 onChange={handleEditChange}
                 className="form-control"
                 name="name"
-                placeholder="Tên màu"
+                placeholder="Tên chi nhánh"
               />
             </FormGroup>
             <FormGroup>
-              <ControlLabel>Chọn màu đàn:</ControlLabel>
-              <ChromePicker
-                color={editState.color.hex}
-                onChangeComplete={(color, event) => {
-                  setEditState({
-                    ...editState,
-                    color: { ...editState.color, hex: color.hex }
-                  });
-                }}
+              <ControlLabel>Địa chỉ:</ControlLabel>
+              <input
+                value={editState.department.address}
+                onChange={handleEditChange}
+                className="form-control"
+                name="address"
+                placeholder="Địa chỉ"
               />
             </FormGroup>
           </Modal.Body>
@@ -353,7 +342,7 @@ const Manu = withRouter(function ListManu(props) {
     </div>
   );
 });
-export default test;
+export default Manu;
 function test() {
   return <Manu />;
 }
