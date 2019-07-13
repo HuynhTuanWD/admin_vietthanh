@@ -17,48 +17,18 @@ import Reply from "@material-ui/icons/Reply";
 import Loader from "react-loader";
 import Swal from "sweetalert2";
 import Checkbox from "elements/CustomCheckbox/CustomCheckbox.jsx";
-import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import { convertFromRaw, convertToRaw, EditorState } from "draft-js";
-import draftToHtml from "draftjs-to-html";
 import { IMG_PRODUCT_URL, IMG_NO_URL } from "config";
 import _ from "lodash";
-function CustomEditor(props) {
-  async function uploadImageCallBack(file) {
-    let fd = new FormData();
-    fd.append("productImage", file);
-    let res = await axios.post("/product/image", fd);
-    return {
-      data: {
-        link: IMG_PRODUCT_URL + res.data
-      }
-    };
-  }
-  return (
-    <Editor
-      {...props}
-      wrapperClassName="demo-wrapper"
-      editorClassName="demo-editor"
-      toolbar={{
-        inline: { inDropdown: true },
-        list: { inDropdown: true },
-        textAlign: { inDropdown: true },
-        link: { inDropdown: true },
-        history: { inDropdown: true },
-        image: {
-          uploadCallback: uploadImageCallBack,
-          alt: { present: true, mandatory: true }
-        }
-      }}
-    />
-  );
-}
+import CustomEditor from "./CustomEditor";
+import FormData from "form-data";
 export default withRouter(function AddProduct(props) {
   let file1 = React.createRef();
   let file2 = React.createRef();
   let file3 = React.createRef();
   let file4 = React.createRef();
-  const [fileUpload, setFileUpload] = useState(["", "", "", ""]);
+  const [fileUpload, setFileUpload] = useState([0, 0, 0, 0]);
+  const [fileStatus, setFileStatus] = useState(["0", "0", "0", "0"]);
   const [srcImage1, setSrcImage1] = useState("");
   const [nameImage1, setNameImage1] = useState("");
   const [srcImage2, setSrcImage2] = useState("");
@@ -77,14 +47,13 @@ export default withRouter(function AddProduct(props) {
   const [_manufacturer, set_manufacturer] = useState(null);
   const [quantity, setQuantity] = useState(0);
   const [_departments, set_departments] = useState([]);
+  const [colors, setColors] = useState([]);
   const [shortDescription, setShortDescription] = useState(null);
   const [description, setDescription] = useState(null);
   const [technicalSpec, setTechnicalSpec] = useState(null);
-
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [manufacturerOptions, setManufacturerOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
-  const [colors, setColors] = useState([]);
 
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -122,17 +91,21 @@ export default withRouter(function AddProduct(props) {
 
   const handleFileChange = (e, setNameImage, setSrcImage, th) => {
     // setFileUpload(e.target.files[0]);
-    setFileUpload(
-      fileUpload.map((item, idx) => (idx === th ? e.target.files[0] : item))
-    );
-    if (e.target.files[0]) {
-      setNameImage(e.target.files[0].name);
+    let fileHandle = e.target.files[0];
+    if (fileHandle) {
+      setFileUpload(
+        fileUpload.map((item, idx) => (idx === th ? fileHandle : item))
+      );
+      setFileStatus(fileStatus.map((item, idx) => (idx === th ? "ADD" : item)));
+      setNameImage(fileHandle.name);
       let reader = new FileReader();
       reader.onload = e => {
         setSrcImage(e.target.result);
       };
-      reader.readAsDataURL(e.target.files[0]);
+      reader.readAsDataURL(fileHandle);
     } else {
+      setFileUpload(fileUpload.map((item, idx) => (idx === th ? 0 : item)));
+      setFileStatus(fileStatus.map((item, idx) => (idx === th ? 0 : item)));
       setSrcImage("");
       setNameImage("");
     }
@@ -140,34 +113,52 @@ export default withRouter(function AddProduct(props) {
   const handleSubmit = async e => {
     console.log("sumit");
     e.preventDefault();
-    // console.log(fileUpload.map((item, idx) => (item.type ? 1 : 0)));
-    // console.log(fileUpload);
-    // try {
-    //   await setIsLoading(true);
-    //   var fd = new FormData();
-    //   // fd.append("name", name);
-    //   for (let i = 0; i < fileUpload.length; i++) {
-    //     fd.append("productImages", fileUpload[i]);
-    //   }
-    //   let res = await axios.post("/product", fd);
-    //   await setIsLoading(false);
-    //   if (res.status == 200) {
-    //     const Toast = Swal.mixin({
-    //       toast: true,
-    //       position: "top-end",
-    //       showConfirmButton: false,
-    //       timer: 3000
-    //     });
-    //     Toast.fire({
-    //       type: "success",
-    //       title: "Thêm thành công"
-    //     });
-    //     // history.push("/sanpham/thuonghieu/danhsach");
-    //   }
-    // } catch (err) {
-    //   setIsError(true);
-    //   setIsLoading(false);
-    // }
+    try {
+      await setIsLoading(true);
+      var fd = new FormData();
+      fd.append(
+        "product",
+        JSON.stringify({
+          name,
+          isLabelNew,
+          isLabelPrice,
+          price,
+          discount,
+          discountOnline,
+          _categories,
+          _manufacturer,
+          quantity,
+          _departments,
+          shortDescription,
+          description,
+          technicalSpec,
+          colors
+        })
+      );
+      console.log(fileStatus);
+      for (let i = 0; i < fileUpload.length; i++) {
+        fd.append("productImages", fileUpload[i]);
+        fd.append("fileStatus", fileStatus[i]);
+      }
+      let res = await axios.post("/product", fd);
+      await setIsLoading(false);
+      if (res.status == 200) {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000
+        });
+        Toast.fire({
+          type: "success",
+          title: "Thêm thành công"
+        });
+        history.push("/sanpham/thuonghieu/danhsach");
+      }
+    } catch (err) {
+      setIsError(true);
+      setIsLoading(false);
+    }
   };
   return (
     <div className="main-content">
@@ -495,9 +486,6 @@ export default withRouter(function AddProduct(props) {
                 <CustomEditor
                   editorState={shortDescription}
                   onEditorStateChange={editor => {
-                    console.log(
-                      draftToHtml(convertToRaw(editor.getCurrentContent()))
-                    );
                     setShortDescription(editor);
                   }}
                 />
@@ -507,9 +495,6 @@ export default withRouter(function AddProduct(props) {
                 <CustomEditor
                   editorState={description}
                   onEditorStateChange={editor => {
-                    console.log(
-                      draftToHtml(convertToRaw(editor.getCurrentContent()))
-                    );
                     setDescription(editor);
                   }}
                 />
@@ -519,9 +504,6 @@ export default withRouter(function AddProduct(props) {
                 <CustomEditor
                   editorState={technicalSpec}
                   onEditorStateChange={editor => {
-                    console.log(
-                      draftToHtml(convertToRaw(editor.getCurrentContent()))
-                    );
                     setTechnicalSpec(editor);
                   }}
                 />

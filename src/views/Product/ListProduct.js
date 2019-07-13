@@ -14,7 +14,7 @@ export default withRouter(function ListProduct(props) {
   useEffect(() => {
     async function fetchManu() {
       try {
-        let res = await axios.get("/manufacturers");
+        let res = await axios.get("/products");
         setManuData(res.data);
       } catch (err) {
         console.log(err);

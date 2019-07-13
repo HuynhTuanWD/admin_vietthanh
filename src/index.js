@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import dotenv from 'dotenv'
+import dotenv from "dotenv";
 import indexRoutes from "./routes/index.jsx";
 import { StateProvider, useStateValue } from "./state";
 import registerServiceWorker from "./registerServiceWorker";
@@ -13,9 +13,11 @@ import "./assets/css/pe-icon-7-stroke.css";
 import "./assets/css/style.css";
 import axios from "axios";
 import { deepStrictEqual } from "assert";
-import store from "store"
+import store from "store";
 dotenv.config();
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+axios.defaults.headers.common["Authorization"] = store.get("token");
+// axios.defaults.proxy = "http://localhost:3000";
 const App = () => {
   const initialState = {
     app: {
@@ -26,13 +28,16 @@ const App = () => {
   };
   const appReducer = (app, action) => {
     switch (action.type) {
-      case "LOGIN":
+      case "LOG_IN": {
+        axios.defaults.headers.common["Authorization"] = store.get("token");
         return {
           ...app,
           isLogin: true,
           token: action.token
         };
+      }
       case "LOG_OUT":
+        axios.defaults.headers.common["Authorization"] = "";
         return {
           ...app,
           isLogin: false,
@@ -76,10 +81,7 @@ const Test = () => {
     let data = {
       name: "123"
     };
-    let res = await axios.post(
-      "/api/user/uploadAvatar",
-      fd
-    );
+    let res = await axios.post("/api/user/uploadAvatar", fd);
     console.log(res.data);
   };
   return <App />;

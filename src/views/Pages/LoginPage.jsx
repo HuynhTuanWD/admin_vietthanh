@@ -13,7 +13,7 @@ import Button from "elements/CustomButton/CustomButton.jsx";
 import Loader from "react-loader";
 import { useInput } from "../../hooks/input-hook";
 import axios from "axios";
-import { useStateValue } from "../../state";
+import { useStateValue } from "state";
 import store from "store";
 export default function LoginPage() {
   const [cardHidden, setCardHidden] = useState(true);
@@ -47,15 +47,20 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      let res = await axios.post("/api/user/signIn", { username, password });
+      let res = await axios.post("/user/signIn", { username, password });
       if (res.status === 200) {
         store.set("token", res.data.token);
-        console.log(store.get("token"));
-        dispatch({ type: "LOGIN", token: res.token });
+        dispatch({ type: "LOG_IN", token: res.token });
       }
     } catch (err) {
-      setIsError(true);
-      setIsLoading(false);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setIsError(true);
+          setIsLoading(false);
+        }
+      } else {
+        console.log("API LOGIN ERROR");
+      }
     }
   };
   return (
