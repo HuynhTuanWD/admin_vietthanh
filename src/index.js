@@ -18,7 +18,7 @@ dotenv.config();
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 axios.defaults.headers.common["Authorization"] = store.get("token");
 // axios.defaults.proxy = "http://localhost:3000";
-const App = () => {
+const AppWithReducer = () => {
   const initialState = {
     app: {
       token: "",
@@ -68,23 +68,10 @@ const App = () => {
   );
 };
 
-const Test = () => {
-  const handleChangeImage = e => {
-    console.log(e.target.files[0]);
-    setFile(e.target.files[0]);
-  };
-  const [file, setFile] = useState("");
-  const handleSubmit = async e => {
-    e.preventDefault();
-    let fd = new FormData();
-    fd.append("avatar", file);
-    let data = {
-      name: "123"
-    };
-    let res = await axios.post("/api/user/uploadAvatar", fd);
-    console.log(res.data);
-  };
-  return <App />;
-};
+const App = () => {
+  return (
+    <AppWithReducer/>
+  )
+}
 ReactDOM.render(<App />, document.getElementById("root"));
 registerServiceWorker();

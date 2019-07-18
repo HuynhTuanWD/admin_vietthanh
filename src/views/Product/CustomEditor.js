@@ -2,7 +2,10 @@ import { IMG_PRODUCT_URL } from "config";
 import axios from "axios";
 import React from "react";
 import { Editor } from "react-draft-wysiwyg";
-export default function CustomEditor(props) {
+import { EditorState, ContentState, convertToRaw } from "draft-js";
+import htmlToDraft from "html-to-draftjs";
+import draftToHtml from "draftjs-to-html";
+export function CustomEditor(props) {
   async function uploadImageCallBack(file) {
     let fd = new FormData();
     fd.append("productImage", file);
@@ -31,4 +34,12 @@ export default function CustomEditor(props) {
       }}
     />
   );
+}
+export function htmlToEditorState(html) {
+  return EditorState.createWithContent(
+    ContentState.createFromBlockArray(htmlToDraft(html))
+  );
+}
+export function editorStateToHtml(editorState) {
+  return draftToHtml(convertToRaw(editorState.getCurrentContent()));
 }

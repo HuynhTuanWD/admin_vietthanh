@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useEffect, useState } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
 // this is used to create scrollbars on windows devices like the ones from apple devices
 import * as Ps from "perfect-scrollbar";
@@ -9,12 +9,15 @@ import NotificationSystem from "react-notification-system";
 import Sidebar from "components/Sidebar/Sidebar.jsx";
 import Header from "components/Header/Header.jsx";
 import Footer from "components/Footer/Footer.jsx";
-import {withRouter} from 'react-router-dom';
+import { withRouter } from "react-router-dom";
 // dinamically create dashboard routes
 import dashRoutes from "routes/dash.jsx";
 // style for notifications
 import { style } from "variables/Variables.jsx";
-
+import { useStateValue } from "state";
+import store from "store";
+import axios from "axios";
+import Swal from "sweetalert2";
 class Dash extends Component {
   constructor(props) {
     super(props);
@@ -23,6 +26,7 @@ class Dash extends Component {
       _notificationSystem: null
     };
   }
+
   componentDidMount() {
     this.setState({ _notificationSystem: this.refs.notificationSystem });
     if (window.matchMedia(`(min-width: 960px)`).matches && !this.isMac()) {
@@ -98,10 +102,13 @@ class Dash extends Component {
         <Sidebar {...this.props} />
         <div
           className={
-            (this.props.location.pathname=="/sanpham/danhmuc"?"fixscroll":"main-panel") +
+            (this.props.location.pathname == "/sanpham/danhmuc"
+              ? "fixscroll"
+              : "main-panel") +
             (this.props.location.pathname === "/maps/full-screen-maps"
               ? " main-panel-maps"
-              : "") + " ps"
+              : "") +
+            " ps"
           }
           ref="mainPanel"
         >
@@ -124,12 +131,14 @@ class Dash extends Component {
                       />
                     );
                   } else {
-                    return !prop.component || (
-                      <Route
-                        path={prop.path}
-                        component={prop.component}
-                        key={key}
-                      />
+                    return (
+                      !prop.component || (
+                        <Route
+                          path={prop.path}
+                          component={prop.component}
+                          key={key}
+                        />
+                      )
                     );
                   }
                 });
@@ -156,4 +165,32 @@ class Dash extends Component {
   }
 }
 
-export default withRouter(props => <Dash {...props}/>);;
+const DashWithRoute = withRouter(props => <Dash {...props} />);
+const DashWithProfile = props => {
+  const { history } = props;
+  const [, dispatch] = useStateValue();
+  useEffect(() => {
+    async function checkTokenAndFetchProfile() {
+      const token = store.get("token");
+      if (token) {
+        try {
+          await axios.get("/user/userProfile");
+        } catch (err) {
+          if (err.response.status == 400) {
+            store.set("token", "");
+            Swal.fire(
+              "Cảnh báo!",
+              "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!",
+              "error"
+            ).then(result => history.push({ pathname: "/pages/login-page" }));
+          }
+        }
+      } else {
+      }
+    }
+    checkTokenAndFetchProfile();
+  }, []);
+  return <DashWithRoute {...props} />;
+};
+
+export default withRouter(props => <DashWithProfile {...props} />);

@@ -20,7 +20,7 @@ import Checkbox from "elements/CustomCheckbox/CustomCheckbox.jsx";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { IMG_PRODUCT_URL, IMG_NO_URL } from "config";
 import _ from "lodash";
-import CustomEditor from "./CustomEditor";
+import { CustomEditor, htmlToEditorState,editorStateToHtml } from "./CustomEditor";
 import FormData from "form-data";
 export default withRouter(function AddProduct(props) {
   let file1 = React.createRef();
@@ -48,9 +48,9 @@ export default withRouter(function AddProduct(props) {
   const [quantity, setQuantity] = useState(0);
   const [_departments, set_departments] = useState([]);
   const [colors, setColors] = useState([]);
-  const [shortDescription, setShortDescription] = useState(null);
-  const [description, setDescription] = useState(null);
-  const [technicalSpec, setTechnicalSpec] = useState(null);
+  const [shortDescriptionEditor, setShortDescriptionEditor] = useState(null);
+  const [descriptionEditor, setDescriptionEditor] = useState(null);
+  const [technicalSpecEditor, setTechnicalSpecEditor] = useState(null);
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [manufacturerOptions, setManufacturerOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
@@ -116,6 +116,9 @@ export default withRouter(function AddProduct(props) {
     try {
       await setIsLoading(true);
       var fd = new FormData();
+      let shortDescription = editorStateToHtml(shortDescriptionEditor);
+      let description = editorStateToHtml(descriptionEditor);
+      let technicalSpec = editorStateToHtml(technicalSpecEditor);
       fd.append(
         "product",
         JSON.stringify({
@@ -153,7 +156,7 @@ export default withRouter(function AddProduct(props) {
           type: "success",
           title: "Thêm thành công"
         });
-        history.push("/sanpham/thuonghieu/danhsach");
+        history.push("/sanpham/sanpham/danhsach");
       }
     } catch (err) {
       setIsError(true);
@@ -484,27 +487,27 @@ export default withRouter(function AddProduct(props) {
               <FormGroup>
                 <ControlLabel>Mô tả ngắn:</ControlLabel>
                 <CustomEditor
-                  editorState={shortDescription}
+                  editorState={shortDescriptionEditor}
                   onEditorStateChange={editor => {
-                    setShortDescription(editor);
+                    setShortDescriptionEditor(editor);
                   }}
                 />
               </FormGroup>
               <FormGroup>
                 <ControlLabel>Mô tả:</ControlLabel>
                 <CustomEditor
-                  editorState={description}
+                  editorState={descriptionEditor}
                   onEditorStateChange={editor => {
-                    setDescription(editor);
+                    setDescriptionEditor(editor);
                   }}
                 />
               </FormGroup>
               <FormGroup>
                 <ControlLabel>Thông số kỹ thuật:</ControlLabel>
                 <CustomEditor
-                  editorState={technicalSpec}
+                  editorState={technicalSpecEditor}
                   onEditorStateChange={editor => {
-                    setTechnicalSpec(editor);
+                    setTechnicalSpecEditor(editor);
                   }}
                 />
               </FormGroup>

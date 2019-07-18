@@ -16,3 +16,7 @@ html {
   margin-bottom: 5px;
   text-transform: uppercase;
 }
+.MuiTableCell-root{
+  padding-top: 7px !important;
+  padding-bottom: 7px !important;
+}

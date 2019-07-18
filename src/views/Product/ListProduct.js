@@ -6,8 +6,9 @@ import Swal from "sweetalert2";
 import Tooltip from "@material-ui/core/Tooltip";
 import AddIcon from "@material-ui/icons/Add";
 import Fab from "@material-ui/core/Fab";
+import Chip from "@material-ui/core/Chip";
 import axios from "axios";
-import { IMG_MANU_URL, IMG_NO_URL } from "config";
+import { IMG_PRODUCT_URL, IMG_NO_URL } from "config";
 export default withRouter(function ListProduct(props) {
   const { history } = props;
   const [manuData, setManuData] = useState([]);
@@ -47,15 +48,51 @@ export default withRouter(function ListProduct(props) {
                   render: rowData => (
                     <img
                       src={
-                        rowData.image == ""
+                        rowData.images[0] == ""
                           ? IMG_NO_URL
-                          : IMG_MANU_URL + rowData.image
+                          : IMG_PRODUCT_URL + rowData.images[0]
                       }
-                      style={{ height: 20 }}
+                      style={{ height: 50 }}
                     />
                   )
                 },
-                { title: "Tên", field: "name" }
+                { title: "Tên sản phẩm", field: "name" },
+                { title: "Giá", field: "price" },
+                { title: "Số lượng", field: "quantity" },
+                {
+                  title: "Chi nhánh có hàng",
+                  field: "_departments",
+                  render: rowData =>
+                    rowData._departments.map((item, idx) => (
+                      <Chip
+                        clickable
+                        key={idx}
+                        size="small"
+                        label={item.name}
+                        className="primary"
+                      />
+                    ))
+                },
+                {
+                  title: "Danh mục",
+                  field: "_categories",
+                  render: rowData =>
+                    rowData._categories.map((item, idx) => (
+                      <Chip
+                        clickable
+                        key={idx}
+                        color="primary"
+                        size="small"
+                        label={item.title}
+                        className="primary"
+                      />
+                    ))
+                },
+                {
+                  title: "Trạng thái",
+                  field: "isActive",
+                  render: rowData => (rowData.isActive === true ? "Bật" : "Tắt")
+                }
               ]}
               data={manuData}
               actions={[
