@@ -16,11 +16,10 @@ class App extends Component {
   }
   static contextType = StateContext;
   render() {
-    const [{ app }, dispatch] = this.context;
     return (
       <Switch>
-        {app.isLogin ? <Route component={Dash} /> : <Route component={Login} />}
-        })}
+        <Route path="/login" component={Login} />
+        <Route path="/" component={Dash} />
       </Switch>
     );
   }

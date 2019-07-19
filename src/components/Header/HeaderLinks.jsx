@@ -10,9 +10,10 @@ import {
   InputGroup
 } from "react-bootstrap";
 import { useStateValue } from "state";
-import store from "store"
-export default function HeaderLinks() {
-  const [, dispatch] = useStateValue();
+import store from "store";
+import { withRouter } from "react-router-dom";
+export default withRouter(function HeaderLinks(props) {
+  const { history } = props;
   return (
     <div>
       <Navbar.Form pullLeft className="navbar-search-form">
@@ -102,8 +103,8 @@ export default function HeaderLinks() {
           </MenuItem>
           <MenuItem
             onClick={e => {
-              store.set("token", null);
-              dispatch({ type: "LOG_OUT" });
+              store.set("token", "");
+              history.push("/login");
             }}
             eventKey={4.5}
           >
@@ -115,4 +116,4 @@ export default function HeaderLinks() {
       </Nav>
     </div>
   );
-}
+});

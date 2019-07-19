@@ -5,7 +5,7 @@ class Footer extends Component {
         return (
             <footer className={"footer" + (this.props.transparent !== undefined ? " footer-transparent":"")}>
                 <div className={"container" + (this.props.fluid !== undefined ? "-fluid":"")}>
-                    <nav className="pull-left">
+                    {/* <nav className="pull-left">
                         <ul>
                             <li>
                                 <a href="#pablo">
@@ -28,9 +28,9 @@ class Footer extends Component {
                                 </a>
                             </li>
                         </ul>
-                    </nav>
+                    </nav> */}
                     <p className="copyright pull-right">
-                        &copy; {1900 + (new Date()).getYear()} <a href="http://www.creative-tim.com">Creative Tim</a>, made with <i className="fa fa-heart heart"></i> for a better web
+                        &copy; {1900 + (new Date()).getYear()}, made with <i className="fa fa-heart heart"></i> for a better web
                     </p>
                 </div>
             </footer>

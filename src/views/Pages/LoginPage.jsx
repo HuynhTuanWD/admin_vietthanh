@@ -15,7 +15,9 @@ import { useInput } from "../../hooks/input-hook";
 import axios from "axios";
 import { useStateValue } from "state";
 import store from "store";
-export default function LoginPage() {
+import { withRouter } from "react-router-dom";
+export default withRouter(function LoginPage(props) {
+  const { history } = props;
   const [cardHidden, setCardHidden] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -51,6 +53,7 @@ export default function LoginPage() {
       if (res.status === 200) {
         store.set("token", res.data.token);
         dispatch({ type: "LOG_IN", token: res.token });
+        history.push("/");
       }
     } catch (err) {
       if (err.response) {
@@ -115,4 +118,4 @@ export default function LoginPage() {
       </Row>
     </Grid>
   );
-}
+});

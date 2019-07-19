@@ -7,12 +7,12 @@ import PagesHeader from "components/Header/PagesHeader.jsx";
 // dinamically create pages routes
 
 import bgImage from "assets/img/full-screen-image-3.jpg";
-
+import store from "store";
 class Pages extends Component {
   getPageClass() {
     var pageClass = "";
     switch (this.props.location.pathname) {
-      case "/pages/login-page":
+      case "/login":
         pageClass = " login-page";
         break;
       case "/pages/register-page":
@@ -32,6 +32,9 @@ class Pages extends Component {
       document.documentElement.classList.toggle("nav-open");
     }
   }
+  componentDidMount(){
+    store.set("token","");
+  }
   render() {
     return (
       <div>
@@ -44,8 +47,8 @@ class Pages extends Component {
           >
             <div className="content">
               <Switch>
-                <Route path="/pages/login-page" component={LoginPage} />
-                <Redirect to="/pages/login-page" />
+                <Route path="/login" component={LoginPage} />
+                <Redirect to="/login" />
               </Switch>
             </div>
             {/* <Footer transparent /> */}

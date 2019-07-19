@@ -12,13 +12,23 @@ import image from "assets/img/full-screen-image-3.jpg";
 // image for avatar in Sidebar
 import avatar from "assets/img/default-avatar.png";
 // logo for sidebar
-import logo from "logo.svg";
+import logo from "logo-icon.png";
 
 import dashRoutes from "routes/dash.jsx";
-
+import profileRoutes from "routes/profile.jsx";
+import { Link } from "react-router-dom";
+import { IMG_NO_AVATAR, IMG_AVATAR_URL } from "config";
+import { StateContext } from "state";
+import store from "store";
+import Swal from "sweetalert2";
+import axios from "axios";
+import { withRouter } from "react-router-dom";
+import GuitarIcon from "assets/img/guitar-solid.svg";
+import { lineHeight } from "@material-ui/system";
 const bgImage = { backgroundImage: "url(" + image + ")" };
 
 class Sidebar extends Component {
+  static contextType = StateContext;
   constructor(props) {
     super(props);
     this.state = {
@@ -41,7 +51,23 @@ class Sidebar extends Component {
   updateDimensions() {
     this.setState({ width: window.innerWidth });
   }
-  componentDidMount() {
+  async componentDidMount() {
+    const [{}, dispatch] = this.context;
+    try {
+      let userProfile = await axios.get("/user/userProfile");
+      dispatch({ type: "GET_PROFILE", payload: userProfile.data });
+    } catch (err) {
+      if (err.response.status == 401) {
+        store.set("token", "");
+        Swal.fire(
+          "Cảnh báo!",
+          "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!",
+          "error"
+        );
+        this.props.history.push("/login");
+      }
+    }
+
     this.updateDimensions();
     // add event listener for windows resize
     window.addEventListener("resize", this.updateDimensions.bind(this));
@@ -71,29 +97,37 @@ class Sidebar extends Component {
     return bool;
   }
   render() {
+    const [{ user }, dispatch] = this.context;
     return (
       <div className="sidebar" data-color="black" data-image={image}>
         <div className="sidebar-background" style={bgImage} />
         <div className="logo">
-          <a
-            href="http://www.creative-tim.com"
+          <Link
             className="simple-text logo-mini"
+            to={process.env.REACT_APP_DOMAIN}
           >
             <div className="logo-img">
-              <img src={logo} alt="react-logo" />
+              <img style={{ width: 30 }} src={logo} alt="react-logo" />
             </div>
-          </a>
-          <a
-            href="http://www.creative-tim.com"
+          </Link>
+          <Link
+            to={process.env.REACT_APP_DOMAIN}
             className="simple-text logo-normal"
           >
-            Creative Tim
-          </a>
+            Việt Thanh
+          </Link>
         </div>
         <div className="sidebar-wrapper" ref="sidebarWrapper">
           <div className="user">
             <div className="photo">
-              <img src={avatar} alt="Avatar" />
+              <img
+                src={
+                  user.avatar == ""
+                    ? IMG_NO_AVATAR
+                    : IMG_AVATAR_URL + user.avatar
+                }
+                alt="Avatar"
+              />
             </div>
             <div className="info">
               <a
@@ -102,7 +136,7 @@ class Sidebar extends Component {
                 }
               >
                 <span>
-                  Tania Andrew
+                  {user.name}
                   <b
                     className={
                       this.state.openAvatar ? "caret rotate-180" : "caret"
@@ -112,24 +146,20 @@ class Sidebar extends Component {
               </a>
               <Collapse in={this.state.openAvatar}>
                 <ul className="nav">
-                  <li>
-                    <a>
-                      <span className="sidebar-mini">MP</span>
-                      <span className="sidebar-normal">My Profile</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a>
-                      <span className="sidebar-mini">EP</span>
-                      <span className="sidebar-normal">Edit Profile</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a>
-                      <span className="sidebar-mini">S</span>
-                      <span className="sidebar-normal">Settings</span>
-                    </a>
-                  </li>
+                  {profileRoutes.map((prop, key) => (
+                    <li className={this.activeRoute(prop.path)} key={key}>
+                      <NavLink
+                        to={prop.path}
+                        className="nav-link"
+                        activeClassName="active"
+                      >
+                        <i style={{lineHeight:"17px"}} className={prop.icon} />
+                        <span className="sidebar-normal">
+                          {prop.name}
+                        </span>
+                      </NavLink>
+                    </li>
+                  ))}
                 </ul>
               </Collapse>
             </div>
@@ -197,16 +227,18 @@ class Sidebar extends Component {
                   return null;
                 } else {
                   return (
-                    <li className={this.activeRoute(prop.path)} key={key}>
-                      <NavLink
-                        to={prop.path}
-                        className="nav-link"
-                        activeClassName="active"
-                      >
-                        <i className={prop.icon} />
-                        <p>{prop.name}</p>
-                      </NavLink>
-                    </li>
+                    prop.isHidden || (
+                      <li className={this.activeRoute(prop.path)} key={key}>
+                        <NavLink
+                          to={prop.path}
+                          className="nav-link"
+                          activeClassName="active"
+                        >
+                          <i className={prop.icon} />
+                          <p>{prop.name}</p>
+                        </NavLink>
+                      </li>
+                    )
                   );
                 }
               }
@@ -218,4 +250,4 @@ class Sidebar extends Component {
   }
 }
 
-export default Sidebar;
+export default withRouter(props => <Sidebar {...props} />);

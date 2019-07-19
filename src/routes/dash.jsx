@@ -33,7 +33,6 @@ import ListDepartment from "../views/Department/ListDepartment";
 import Test from "../views/Product/Test";
 import Category from "../views/Category/Category";
 import pagesRoutes from "./pages.jsx";
-
 var pages = [
   {
     path: "/pages/user-page",
@@ -47,15 +46,15 @@ var dashRoutes = [
   {
     path: "/thongke",
     name: "Thống kê",
-    icon: "pe-7s-graph",
+    icon: "pe-7s-graph1",
     component: Dashboard
   },
   {
     collapse: true,
     path: "/sanpham",
-    name: "Sản phẩm",
+    name: "Cửa hàng",
     state: "openThuonghieu",
-    icon: "pe-7s-album",
+    icon: "pe-7s-home",
     views: [
       {
         path: "/sanpham/sanpham/danhsach/them",
@@ -114,7 +113,7 @@ var dashRoutes = [
         name: "Chi nhánh",
         mini: "CN",
         component: ListDepartment
-      },
+      }
       // {
       //   path: "/sanpham/sanpham/test/test",
       //   name: "Test",
@@ -124,11 +123,17 @@ var dashRoutes = [
     ]
   },
   {
+    path: "/donhang",
+    name: "Đơn hàng",
+    icon: "pe-7s-note2",
+    component: Dashboard
+  },
+  {
     collapse: true,
     path: "/hethong",
     name: "Hệ thống",
     state: "openHethong",
-    icon: "pe-7s-album",
+    icon: "pe-7s-config",
     views: [
       {
         path: "/hethong/taikhoan/danhsach/them",
@@ -153,57 +158,51 @@ var dashRoutes = [
     ]
   },
   {
-    path: "/donhang",
-    name: "Đơn hàng",
-    icon: "pe-7s-note2",
-    component: Dashboard
+    collapse: true,
+    path: "/components",
+    name: "Components",
+    state: "openComponents",
+    icon: "pe-7s-plugin",
+    views: [
+      {
+        path: "/components/buttons",
+        name: "Buttons",
+        mini: "B",
+        component: Buttons
+      },
+      {
+        path: "/components/grid-system",
+        name: "Grid System",
+        mini: "GS",
+        component: GridSystem
+      },
+      {
+        path: "/components/panels",
+        name: "Panels",
+        mini: "P",
+        component: Panels
+      },
+      {
+        path: "/components/sweet-alert",
+        name: "Sweet Alert",
+        mini: "SA",
+        component: SweetAlert
+      },
+      {
+        path: "/components/notifications",
+        name: "Notifications",
+        mini: "N",
+        component: Notifications
+      },
+      { path: "/components/icons", name: "Icons", mini: "I", component: Icons },
+      {
+        path: "/components/typography",
+        name: "Typography",
+        mini: "T",
+        component: Typography
+      }
+    ]
   },
-  // {
-  //   collapse: true,
-  //   path: "/components",
-  //   name: "Components",
-  //   state: "openComponents",
-  //   icon: "pe-7s-plugin",
-  //   views: [
-  //     {
-  //       path: "/components/buttons",
-  //       name: "Buttons",
-  //       mini: "B",
-  //       component: Buttons
-  //     },
-  //     {
-  //       path: "/components/grid-system",
-  //       name: "Grid System",
-  //       mini: "GS",
-  //       component: GridSystem
-  //     },
-  //     {
-  //       path: "/components/panels",
-  //       name: "Panels",
-  //       mini: "P",
-  //       component: Panels
-  //     },
-  //     {
-  //       path: "/components/sweet-alert",
-  //       name: "Sweet Alert",
-  //       mini: "SA",
-  //       component: SweetAlert
-  //     },
-  //     {
-  //       path: "/components/notifications",
-  //       name: "Notifications",
-  //       mini: "N",
-  //       component: Notifications
-  //     },
-  //     { path: "/components/icons", name: "Icons", mini: "I", component: Icons },
-  //     {
-  //       path: "/components/typography",
-  //       name: "Typography",
-  //       mini: "T",
-  //       component: Typography
-  //     }
-  //   ]
-  // },
   // {
   //   collapse: true,
   //   path: "/forms",
@@ -293,6 +292,6 @@ var dashRoutes = [
   //   icon: "pe-7s-date",
   //   component: Calendar
   // },
-  { redirect: true, path: "/", pathTo: "/dashboard", name: "Dashboard" }
+  { redirect: true, path: "/", pathTo: "/thongke", name: "Thống kê" }
 ];
 export default dashRoutes;

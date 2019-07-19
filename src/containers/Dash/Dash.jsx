@@ -12,6 +12,7 @@ import Footer from "components/Footer/Footer.jsx";
 import { withRouter } from "react-router-dom";
 // dinamically create dashboard routes
 import dashRoutes from "routes/dash.jsx";
+import profileRoutes from "routes/profile.jsx";
 // style for notifications
 import { style } from "variables/Variables.jsx";
 import { useStateValue } from "state";
@@ -114,6 +115,9 @@ class Dash extends Component {
         >
           <Header {...this.props} />
           <Switch>
+            {profileRoutes.map((prop, key) => (
+              <Route path={prop.path} component={prop.component} key={key} />
+            ))}
             {dashRoutes.map((prop, key) => {
               if (prop.collapse) {
                 return prop.views.map((prop, key) => {
@@ -168,29 +172,38 @@ class Dash extends Component {
 const DashWithRoute = withRouter(props => <Dash {...props} />);
 const DashWithProfile = props => {
   const { history } = props;
-  const [, dispatch] = useStateValue();
+  const [islogin, setIsLogin] = useState(false);
+  const [{}, dispatch] = useStateValue();
   useEffect(() => {
     async function checkTokenAndFetchProfile() {
       const token = store.get("token");
       if (token) {
         try {
-          await axios.get("/user/userProfile");
+          let res_login = await axios.get("/user/isLogin");
+          !(res_login.status == 200) || setIsLogin(true);
         } catch (err) {
-          if (err.response.status == 400) {
+          if (err.response.status == 401) {
             store.set("token", "");
             Swal.fire(
               "Cảnh báo!",
               "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!",
               "error"
-            ).then(result => history.push({ pathname: "/pages/login-page" }));
+            ).then(result => history.push("/login"));
           }
         }
       } else {
+        store.set("token", "");
+        Swal.fire(
+          "Cảnh báo!",
+          "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!",
+          "error"
+        );
+        history.push("/login");
       }
     }
     checkTokenAndFetchProfile();
   }, []);
-  return <DashWithRoute {...props} />;
+  return !islogin || <DashWithRoute {...props} />;
 };
-
+//<DashWithRoute {...props} />
 export default withRouter(props => <DashWithProfile {...props} />);
